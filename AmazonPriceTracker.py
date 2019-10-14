@@ -12,14 +12,18 @@ In email, sending the url as a link, not just as a string
 import requests
 from bs4 import BeautifulSoup
 import smtplib
+import time
+
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"
+            }
 
 
-URL = "https://www.amazon.ca/Mattress-Underblanket-Controller-Settings-Auto-Off/dp/B07G85QKK7/ref=sr_1_7?keywords=electric+blanket&qid=1570827364&sr=8-7"
-
-headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36"}
-
-
-def check_price():
+def check_price(URL):
+    """
+    function that creates the page and returns the current price
+    :return: the current price as a float
+    """
     # returns all the data from the URL provided
     page = requests.get(URL, headers = headers)
 
@@ -39,12 +43,19 @@ def check_price():
     else:
         price = price.get_text()
 
-    converted_price = convert_price(price)
-    print(converted_price, "\n")
-    print(title)
+    """
+        print(converted_price, "\n")
+        print(title)
 
-    if converted_price < 150:
-        send_mail()
+        if converted_price < 150:
+            send_mail()
+    """
+
+    converted_price = convert_price(price)
+    return converted_price
+
+
+
 
 def convert_price(price_str):
     """
@@ -62,8 +73,7 @@ def convert_price(price_str):
     return converted_price
 
 
-def send_mail():
-    email = 'chiefgustavo000@gmail.com'
+def send_mail(email, password, url):
     server = smtplib.SMTP('smtp.gmail.com', 587)
 
     # Command sent by email server to identify itself, to start process of sending email
@@ -71,10 +81,10 @@ def send_mail():
     server.starttls()
     server.ehlo()
 
-    server.login(email,'PianoIsMyLife4Ever!')
+    server.login(email, password)
 
     subject = 'Price has lowered for one of your items'
-    body = 'Check the amazon link %s' % URL
+    body = 'Check the amazon link %s' % url
 
     msg = f"Subject: {subject}\n\n{body}"
 
@@ -87,20 +97,26 @@ def send_mail():
 
 def get_info():
 
-    email = "a"
-    password = "b"
-    URL = "c"
-    max_price = 100
+    email = input("Email: ")
+    password = input("Email password: ")
+    url = input("Amazon URL: ")
+    current_price = check_price(url)
+    max_price = input("Current price is " + str(current_price) + ". What is your maximum price? ")
 
-    return (email, password, URL, max_price)
+    return email, password, url, max_price
 
 
 def main():
     # TODO: User input to get URL and email
-    email, password, URL, max_price = get_info()
+    email, password, url, max_price = get_info()
 
-    print(email, password, URL, max_price)
-    #check_price()
+    print(email, password, url, max_price)
+
+    while check_price(url) > max_price:
+        time.sleep(60 * 60)
+    print("Price has dropped!")
+    send_mail(email, password, url)
+    # check_price()
 
 
 if __name__ == '__main__':
