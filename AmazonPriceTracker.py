@@ -74,7 +74,7 @@ def send_mail():
     server.login(email,'PianoIsMyLife4Ever!')
 
     subject = 'Price has lowered for one of your items'
-    body = 'Check the amazon link'
+    body = 'Check the amazon link %s' % URL
 
     msg = f"Subject: {subject}\n\n{body}"
 
@@ -84,9 +84,23 @@ def send_mail():
 
     server.quit()
 
+
+def get_info():
+
+    email = "a"
+    password = "b"
+    URL = "c"
+    max_price = 100
+
+    return (email, password, URL, max_price)
+
+
 def main():
     # TODO: User input to get URL and email
-    check_price()
+    email, password, URL, max_price = get_info()
+
+    print(email, password, URL, max_price)
+    #check_price()
 
 
 if __name__ == '__main__':
