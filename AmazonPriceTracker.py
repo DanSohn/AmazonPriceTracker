@@ -11,6 +11,8 @@ In email, sending the url as a link, not just as a string
 
 import requests
 from bs4 import BeautifulSoup
+import smtplib
+
 
 URL = "https://www.amazon.ca/Mattress-Underblanket-Controller-Settings-Auto-Off/dp/B07G85QKK7/ref=sr_1_7?keywords=electric+blanket&qid=1570827364&sr=8-7"
 
@@ -41,6 +43,8 @@ def check_price():
     print(converted_price, "\n")
     print(title)
 
+    if converted_price < 150:
+        send_mail()
 
 def convert_price(price_str):
     """
@@ -57,3 +61,33 @@ def convert_price(price_str):
     converted_price = float(price_str[first_digit:])
     return converted_price
 
+
+def send_mail():
+    email = 'chiefgustavo000@gmail.com'
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+
+    # Command sent by email server to identify itself, to start process of sending email
+    server.ehlo()
+    server.starttls()
+    server.ehlo()
+
+    server.login(email,'PianoIsMyLife4Ever!')
+
+    subject = 'Price has lowered for one of your items'
+    body = 'Check the amazon link'
+
+    msg = f"Subject: {subject}\n\n{body}"
+
+    server.sendmail(email, email, msg)
+
+    print("Email has successfully been sent")
+
+    server.quit()
+
+def main():
+    # TODO: User input to get URL and email
+    check_price()
+
+
+if __name__ == '__main__':
+    main()
