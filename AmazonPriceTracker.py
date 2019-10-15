@@ -55,8 +55,6 @@ def check_price(URL):
     return converted_price
 
 
-
-
 def convert_price(price_str):
     """
     Changes the price string of form "CDN$   131.99" into just 131.99 as an integer
@@ -78,7 +76,7 @@ def send_mail(email, password, url):
         server = smtplib.SMTP(host='smtp.gmail.com', port=587)
     elif "outlook" in email or "ucalgary.ca" in email:
         server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
-    else: 
+    else:
         print("Current email server not identified, or not supported. Please try again at a later date!")
         return
 
@@ -113,17 +111,29 @@ def get_info():
 
 
 def main():
-    # TODO: User input to get URL and email
+    statement = "This program is designed to email you if the given Amazon URL's item \n" \
+                "becomes cheaper by a range that you set. You can keep this program\n" \
+                "running in the background. Currently, it only looks at one item. At a\n" \
+                "future date, this project may get revamped to store multiple items from\n" \
+                "past runs.\n" \
+                "Feel free to contact me at junghyun.sohn@ucalgary.ca\n" \
+                "-Jung Hyun Sohn"
+    print(statement)
     email, password, url, max_price = get_info()
 
     print(email, password, url, max_price)
-
-    #while check_price(url) > max_price:
-    #    time.sleep(60 * 60)
-    #print("Price has dropped!")
-    for i in range(15):
-        send_mail(email, password, url)
-    # check_price()
+    check_frequency = float(input("How often do you want to check the price? (SECONDS): "))
+    try:
+        print("Press <Ctrl> + <C> to stop scanning price!")
+        while True:
+            print("Checking price...")
+            if check_price(url) < max_price:
+                print("Price has dropped, sending email...")
+                send_mail(email, password, url)
+                break
+            time.sleep(check_frequency)
+    except KeyboardInterrupt:
+        print("Thank you for trying this program! We do not keep any of your information.")
 
 
 if __name__ == '__main__':
