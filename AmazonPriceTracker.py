@@ -74,7 +74,13 @@ def convert_price(price_str):
 
 
 def send_mail(email, password, url):
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+    if "gmail" in email:
+        server = smtplib.SMTP(host='smtp.gmail.com', port=587)
+    elif "outlook" in email or "ucalgary.ca" in email:
+        server = smtplib.SMTP(host='smtp-mail.outlook.com', port=587)
+    else: 
+        print("Current email server not identified, or not supported. Please try again at a later date!")
+        return
 
     # Command sent by email server to identify itself, to start process of sending email
     server.ehlo()
@@ -88,7 +94,7 @@ def send_mail(email, password, url):
 
     msg = f"Subject: {subject}\n\n{body}"
 
-    server.sendmail(email, email, msg)
+    server.sendmail(email, "ngyatfei199@hotmail.com", msg)
 
     print("Email has successfully been sent")
 
@@ -101,7 +107,7 @@ def get_info():
     password = input("Email password: ")
     url = input("Amazon URL: ")
     current_price = check_price(url)
-    max_price = input("Current price is " + str(current_price) + ". What is your maximum price? ")
+    max_price = float(input("Current price is " + str(current_price) + ". What is your maximum price? "))
 
     return email, password, url, max_price
 
@@ -112,10 +118,11 @@ def main():
 
     print(email, password, url, max_price)
 
-    while check_price(url) > max_price:
-        time.sleep(60 * 60)
-    print("Price has dropped!")
-    send_mail(email, password, url)
+    #while check_price(url) > max_price:
+    #    time.sleep(60 * 60)
+    #print("Price has dropped!")
+    for i in range(15):
+        send_mail(email, password, url)
     # check_price()
 
 
